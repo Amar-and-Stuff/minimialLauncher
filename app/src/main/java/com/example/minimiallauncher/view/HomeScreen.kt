@@ -12,9 +12,12 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -54,6 +57,7 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
     Box(
           modifier = Modifier
               .fillMaxSize()
+              .windowInsetsPadding(WindowInsets.statusBars)
               .pointerInput(Unit) {
                   detectVerticalDragGestures { _, dragAmount ->
                       if (dragAmount < -50) {

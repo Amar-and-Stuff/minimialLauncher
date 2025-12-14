@@ -37,6 +37,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 
 
 @Composable
@@ -100,6 +102,7 @@ fun WeatherWidget(viewModel: WeatherViewModel) {
 
 
 @Composable
+@Preview
 fun ClockWidget() {
     var currentTime by remember { mutableStateOf(getFormattedTime()) }
 
@@ -122,6 +125,7 @@ fun getFormattedTime(): String {
 }
 
 @Composable
+@Preview
 fun CalendarWidget() {
     val today = SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()).format(Date())
     Text(

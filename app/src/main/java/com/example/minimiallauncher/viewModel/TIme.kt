@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.minimiallauncher.R
 import kotlinx.coroutines.delay
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
+@Preview
 fun time() {
  val font = FontFamily(Font(R.font.myfont))
     var Time = remember { mutableStateOf(LocalTime.now()) }
