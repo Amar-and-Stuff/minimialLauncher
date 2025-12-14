@@ -40,7 +40,11 @@ class AppLauncherViewModel(application: Application) : AndroidViewModel(applicat
     private val _drawerVisible = MutableStateFlow(false)
     val drawerVisible = _drawerVisible.asStateFlow()
 
-     private val _searchQuery = MutableStateFlow("")
+    private val _popUpDrawerVisible = MutableStateFlow(false)
+    val popUpDrawerVisible = _popUpDrawerVisible.asStateFlow()
+
+
+    private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
     private val _showSystemUI = MutableSharedFlow<Unit>()
@@ -112,6 +116,10 @@ class AppLauncherViewModel(application: Application) : AndroidViewModel(applicat
             _showSystemUI.emit(Unit)
         }
 
+    }
+
+    fun TogglePopUpDrawerVisibility(show: Boolean) {
+        _popUpDrawerVisible.value = show
     }
 
 

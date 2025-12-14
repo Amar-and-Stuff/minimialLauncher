@@ -42,6 +42,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.animation)
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")

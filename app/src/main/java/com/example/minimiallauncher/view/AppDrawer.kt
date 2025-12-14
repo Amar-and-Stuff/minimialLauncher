@@ -1,8 +1,10 @@
 package com.example.minimiallauncher.view
 
 import android.annotation.SuppressLint
+import android.graphics.Paint
 import  androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -133,7 +136,7 @@ fun AppDrawer(viewModel: AppLauncherViewModel) {
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(apps) { app ->
-                appItem(app)
+                AppItem(app)
             }
         }
     }
@@ -142,13 +145,16 @@ fun AppDrawer(viewModel: AppLauncherViewModel) {
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun appItem(app: AppModel) {
+fun AppItem(app: AppModel) {
     val context = LocalContext.current
 
         Text(
             text = app.appName,
+            textAlign= TextAlign.Center,
             fontSize = 16.sp,
-            modifier = Modifier.clickable{
+
+            modifier = Modifier
+                .clickable{
                 val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
                 if(intent!=null) context.startActivity(intent)
             }

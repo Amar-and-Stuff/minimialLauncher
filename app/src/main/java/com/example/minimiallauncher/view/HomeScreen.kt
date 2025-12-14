@@ -1,5 +1,6 @@
 package com.example.minimiallauncher.view
 
+import android.R
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -8,6 +9,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
@@ -43,14 +47,16 @@ import com.example.minimiallauncher.viewModel.AppLauncherViewModel
 import com.example.minimiallauncher.viewModel.NotesViewModel
 import com.example.minimiallauncher.viewModel.WeatherViewModel
 import com.example.minimiallauncher.viewModel.time
+import com.example.minimiallauncher.view.PopupAppDrawer
 
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,weatherViewModel: WeatherViewModel) {
-    val drawerVisible by viewModel.drawerVisible.collectAsState()
+    val popDrawerVisible by viewModel.popUpDrawerVisible.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val showStickyNote by notesViewModel.stickyNotes.collectAsState()
+
 
 
 
@@ -58,18 +64,6 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
           modifier = Modifier
               .fillMaxSize()
               .windowInsetsPadding(WindowInsets.statusBars)
-              .pointerInput(Unit) {
-                  detectVerticalDragGestures { _, dragAmount ->
-                      if (dragAmount < -50) {
-
-                          viewModel.toggleDrawerVisibility(true)
-                      }
-                      else if (dragAmount> 50)
-                      {
-                        viewModel.requestShowSystemUI()
-                      }
-                  }
-              }
               .pointerInput(Unit) {
                   detectHorizontalDragGestures { _, dragAmount ->
                       when {
@@ -81,9 +75,8 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
 
       ) {
 
-
           AnimatedVisibility(
-              visible = !drawerVisible&&!showStickyNote,
+              visible = !popDrawerVisible&&!showStickyNote,
               enter = fadeIn(),
               exit = fadeOut(),
               modifier = Modifier.align(Alignment.TopCenter)
@@ -91,40 +84,18 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
               HomeWidgets(weatherViewModel)
           }
         AnimatedVisibility(
-            visible = !drawerVisible&&!showStickyNote,
+            visible = !showStickyNote,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            Column(modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = viewModel::updatedSearchQuery,
-                    placeholder = { Text("Search apps") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = null)
-                    }
-                )
+            Button(onClick = { viewModel.TogglePopUpDrawerVisibility(true) }) {
+                Text("all apps", color = Color.White)
             }
 
         }
-
-
-          AnimatedVisibility(
-              visible = drawerVisible,
-              enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-              exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
-              modifier = Modifier
-                  .fillMaxSize()
-                  .zIndex(1f)
-          ) {
-              AppDrawer(viewModel)
-          }
         AnimatedVisibility(
-            visible = showStickyNote,
+            visible = !popDrawerVisible && showStickyNote,
             enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
             exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(),
             modifier = Modifier
@@ -133,8 +104,22 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
         ) {
             StickyNotepadScreen(notesViewModel, onSwipeLeftToClose = {notesViewModel.tooglevisibility(false) })
         }
+        AnimatedVisibility(
+            visible = popDrawerVisible,
+            enter = fadeIn(),
+            exit =  fadeOut(),
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(1f)
+        ) {
+            PopupAppDrawer(
+                popDrawerVisible, onDismiss = { viewModel.TogglePopUpDrawerVisibility(false)}, viewModel)
+        }
+
       }
   }
+
+
 
 
 
