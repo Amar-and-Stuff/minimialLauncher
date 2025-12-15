@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -20,11 +21,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -84,13 +89,37 @@ fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,w
               HomeWidgets(weatherViewModel)
           }
         AnimatedVisibility(
-            visible = !showStickyNote,
+            visible = !showStickyNote && !popDrawerVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            Button(onClick = { viewModel.TogglePopUpDrawerVisibility(true) }) {
-                Text("all apps", color = Color.White)
+            OutlinedButton(
+                onClick = { viewModel.TogglePopUpDrawerVisibility(true) },
+                modifier = Modifier
+                    // 1. Fill the available width
+                    .fillMaxWidth()
+                    .fillMaxSize(0.12f)
+                    // 2. Add padding on the sides and bottom to keep it off the edge
+                    .padding(horizontal = 32.dp, vertical = 24.dp),
+
+                // 3. Customize the shape for rounded corners
+                shape = RoundedCornerShape(16.dp), // Adjust radius as needed
+
+                // 4. Customize the colors (optional, but good for minimal design)
+//                colors = ButtonDefaults.outlinedButtonColors(
+////                    containerColor = Color.Transparent, // Makes the background transparent
+////                    contentColor = MaterialTheme.colorScheme.onBackground // Text color (e.g., White/Black)
+//                ),
+
+                // 5. Customize the border for the outline color/thickness
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground.copy())
+            ) {
+                // 6. Style the text
+                Text(
+                    "ALL APPS", // Use capitalized text for emphasis
+//                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
 
         }

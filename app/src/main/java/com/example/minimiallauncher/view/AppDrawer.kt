@@ -151,13 +151,14 @@ fun AppItem(app: AppModel) {
         Text(
             text = app.appName,
             textAlign= TextAlign.Center,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
 
             modifier = Modifier
                 .clickable{
                 val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
                 if(intent!=null) context.startActivity(intent)
             }
+                .fillMaxWidth()
                 .padding(8.dp))
 
     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -122,6 +123,7 @@ fun PopupAppDrawer(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Search // Change the 'Enter' key to a 'Search' icon
                         ),
+                        shape = RoundedCornerShape(16.dp),
                         keyboardActions = KeyboardActions(
                             onSearch = {
                                 // 1. Get the first filtered app
