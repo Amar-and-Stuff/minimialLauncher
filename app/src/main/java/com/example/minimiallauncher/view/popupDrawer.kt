@@ -92,6 +92,7 @@ fun PopupAppDrawer(
                         awaitPointerEventScope {
                             awaitPointerEvent()
                             onDismiss()
+                            appLauncherViewModel.updatedSearchQuery("")
                         }
 
                     }
