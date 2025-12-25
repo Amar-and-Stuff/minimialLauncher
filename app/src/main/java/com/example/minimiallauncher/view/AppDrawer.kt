@@ -1,15 +1,10 @@
 package com.example.minimiallauncher.view
 
-import android.annotation.SuppressLint
-import android.graphics.Paint
-import  androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -35,11 +30,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.minimiallauncher.model.AppModel
 import com.example.minimiallauncher.viewModel.AppLauncherViewModel
 
 
@@ -135,31 +126,14 @@ fun AppDrawer(viewModel: AppLauncherViewModel) {
                 .weight(1f)
                 .nestedScroll(nestedScrollConnection)
         ) {
+            // It takes the method what should be called when app is launched
             items(apps) { app ->
-                AppItem(app)
+                AppItem(app, {})
             }
         }
     }
 }
 
 
-@SuppressLint("SuspiciousIndentation")
-@Composable
-fun AppItem(app: AppModel) {
-    val context = LocalContext.current
 
-        Text(
-            text = app.appName,
-            textAlign= TextAlign.Center,
-            fontSize = 18.sp,
-
-            modifier = Modifier
-                .clickable{
-                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                if(intent!=null) context.startActivity(intent)
-            }
-                .fillMaxWidth()
-                .padding(8.dp))
-
-    }
 
