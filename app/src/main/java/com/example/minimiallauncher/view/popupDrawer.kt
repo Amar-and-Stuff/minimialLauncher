@@ -6,13 +6,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -35,7 +38,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.example.minimiallauncher.model.SystemAppModel
 import com.example.minimiallauncher.viewModel.PopUpLauncherViewModel
 
 @Composable
@@ -52,6 +59,11 @@ fun PopupAppDrawer(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val cleanupAndDismiss: () -> Unit = {
+        keyboardController?.hide()
+        popUpLauncherViewModel.updatedSearchQuery("")
+        popUpLauncherViewModel.TogglePopUpDrawerVisibility(false) // Calls onDismiss implicitly
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -79,6 +91,7 @@ fun PopupAppDrawer(
                         awaitPointerEventScope {
                             awaitPointerEvent()
                             onDismiss()
+                            popUpLauncherViewModel.updatedSearchQuery("")
                         }
 
                     }
@@ -107,7 +120,7 @@ fun PopupAppDrawer(
 
                     ) {
                         items(apps) { app ->
-                            AppItem(app)
+                            AppItem(app, onAppLaunched = cleanupAndDismiss)
                         }
                     }
                     OutlinedTextField(
@@ -116,6 +129,7 @@ fun PopupAppDrawer(
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Search // Change the 'Enter' key to a 'Search' icon
                         ),
+                        shape = RoundedCornerShape(16.dp),
                         keyboardActions = KeyboardActions(
                             onSearch = {
                                 // 1. Get the first filtered app
@@ -130,9 +144,7 @@ fun PopupAppDrawer(
 
                                     // Hide the keyboard after launching the app
                                     // You might also want to close the drawer
-                                    keyboardController?.hide()
-                                    popUpLauncherViewModel.updatedSearchQuery("")
-                                    popUpLauncherViewModel.toggleDrawerVisibility(false)
+                                    cleanupAndDismiss()
                                 }
 
                             }
@@ -153,3 +165,29 @@ fun PopupAppDrawer(
 }
 
 
+
+
+
+@Composable
+fun AppItem(app: SystemAppModel, onAppLaunched: () -> Unit) {
+    val context = LocalContext.current
+
+
+    Text(
+        text = app.appName,
+        textAlign= TextAlign.Center,
+        fontSize = 18.sp,
+
+        modifier = Modifier
+            .clickable{
+                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                if(intent!=null) {
+                    context.startActivity(intent)
+                    onAppLaunched()
+                }
+            }
+            .fillMaxWidth()
+            .padding(8.dp)
+    )
+
+}
