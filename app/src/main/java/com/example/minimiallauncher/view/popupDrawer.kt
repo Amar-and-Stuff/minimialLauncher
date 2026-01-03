@@ -1,5 +1,6 @@
 package com.example.minimiallauncher.view
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -7,6 +8,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +55,6 @@ fun PopupAppDrawer(
 ) {
     val context = LocalContext.current
     val query by popUpLauncherViewModel.searchQuery.collectAsState()
-
     val apps by popUpLauncherViewModel.filteredApps.collectAsState()
     val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
@@ -62,7 +63,7 @@ fun PopupAppDrawer(
     val cleanupAndDismiss: () -> Unit = {
         keyboardController?.hide()
         popUpLauncherViewModel.updatedSearchQuery("")
-        popUpLauncherViewModel.TogglePopUpDrawerVisibility(false) // Calls onDismiss implicitly
+        popUpLauncherViewModel.togglePopUpDrawerVisibility(false)
     }
 
     LaunchedEffect(Unit) {
@@ -80,24 +81,22 @@ fun PopupAppDrawer(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                //.background(Color(255, 0,0))
         ) {
-
-            // 🔹 Scrim (click outside to dismiss)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.4f))
                     .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            awaitPointerEvent()
-                            onDismiss()
-                            popUpLauncherViewModel.updatedSearchQuery("")
-                        }
-
+                        detectTapGestures(
+                            onTap = {
+                                onDismiss()
+                                popUpLauncherViewModel.updatedSearchQuery("")
+                                Log.d("Popup view", "Tap")
+                                },
+                        )
                     }
             )
-
-            // 🔹 Drawer popup card
             AnimatedVisibility(
                 visible = visible,
                 enter = slideInVertically { it / 2 } + fadeIn(),
@@ -109,7 +108,6 @@ fun PopupAppDrawer(
                         .fillMaxWidth(0.8f)
                         .fillMaxSize(0.4f),
                 ) {
-
                     LazyColumn(
                         state = listState,
                         reverseLayout = true,
@@ -117,7 +115,6 @@ fun PopupAppDrawer(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-
                     ) {
                         items(apps) { app ->
                             AppItem(app, onAppLaunched = cleanupAndDismiss)
@@ -127,26 +124,17 @@ fun PopupAppDrawer(
                         value = query,
                         onValueChange = popUpLauncherViewModel::updatedSearchQuery,
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search // Change the 'Enter' key to a 'Search' icon
+                            imeAction = ImeAction.Search
                         ),
                         shape = RoundedCornerShape(16.dp),
                         keyboardActions = KeyboardActions(
                             onSearch = {
-                                // 1. Get the first filtered app
                                 val firstApp = apps.firstOrNull()
-
-                                // 2. Launch the app if it exists
                                 if (firstApp != null) {
-                                    // You'll need the context to launch the intent
-                                    // Get LocalContext.current at the top of the AppDrawer composable
                                     val intent = context.packageManager.getLaunchIntentForPackage(firstApp.packageName)
                                     if (intent != null) context.startActivity(intent)
-
-                                    // Hide the keyboard after launching the app
-                                    // You might also want to close the drawer
                                     cleanupAndDismiss()
                                 }
-
                             }
                         ),
                         placeholder = { Text("Search apps") },
@@ -165,23 +153,17 @@ fun PopupAppDrawer(
 }
 
 
-
-
-
 @Composable
 fun AppItem(app: SystemAppModel, onAppLaunched: () -> Unit) {
     val context = LocalContext.current
-
-
     Text(
         text = app.appName,
-        textAlign= TextAlign.Center,
+        textAlign = TextAlign.Center,
         fontSize = 18.sp,
-
         modifier = Modifier
-            .clickable{
+            .clickable {
                 val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                if(intent!=null) {
+                if (intent != null) {
                     context.startActivity(intent)
                     onAppLaunched()
                 }
@@ -189,5 +171,4 @@ fun AppItem(app: SystemAppModel, onAppLaunched: () -> Unit) {
             .fillMaxWidth()
             .padding(8.dp)
     )
-
 }

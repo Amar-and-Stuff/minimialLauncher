@@ -10,17 +10,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class NotesViewModel(private val repository: NotepadRepository): ViewModel() {
-        private  val _notes = MutableStateFlow<List<String>>(emptyList())
-    val notes  : StateFlow<List<String>> = _notes
+class NotesViewModel(private val repository: NotepadRepository) : ViewModel() {
+    private val _notes = MutableStateFlow<List<String>>(emptyList())
+    val notes: StateFlow<List<String>> = _notes
 
 
-    private val _stickyNotes = MutableStateFlow(false)
-    val stickyNotes : StateFlow<Boolean> = _stickyNotes
+    private val _stickyNotesVisible = MutableStateFlow(false)
+    val stickyNotesVisible: StateFlow<Boolean> = _stickyNotesVisible
 
-    fun tooglevisibility(show: Boolean) {
-        _stickyNotes.value = show
+    fun toggleVisibility(show: Boolean) {
+        _stickyNotesVisible.value = show
     }
+
     var noteText by mutableStateOf("")
         private set
 

@@ -18,10 +18,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class PopUpLauncherViewModel(application: Application) : AndroidViewModel(application) {
-
-
-
-
     private val _appList = MutableStateFlow<List<SystemAppModel>>(emptyList())
     val appList = _appList.asStateFlow()
 
@@ -106,7 +102,7 @@ class PopUpLauncherViewModel(application: Application) : AndroidViewModel(applic
 
     }
 
-    fun TogglePopUpDrawerVisibility(show: Boolean) {
+    fun togglePopUpDrawerVisibility(show: Boolean) {
         _popUpDrawerVisible.value = show
     }
 }

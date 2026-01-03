@@ -1,6 +1,7 @@
 package com.example.minimiallauncher.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,10 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -35,14 +34,9 @@ import com.example.minimiallauncher.viewModel.WeatherViewModel
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun HomeScreen(viewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel,weatherViewModel: WeatherViewModel) {
-    val popDrawerVisible by viewModel.popUpDrawerVisible.collectAsState()
-    val query by viewModel.searchQuery.collectAsState()
-    val focusRequester = remember { FocusRequester() }
-    val showStickyNote by notesViewModel.stickyNotes.collectAsState()
-
-
-
+fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel, weatherViewModel: WeatherViewModel) {
+    val popDrawerVisible by popupLauncherViewModel.popUpDrawerVisible.collectAsState()
+    val stickyNoteVisible by notesViewModel.stickyNotesVisible.collectAsState()
 
     Box(
           modifier = Modifier
@@ -51,16 +45,22 @@ fun HomeScreen(viewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel
               .pointerInput(Unit) {
                   detectHorizontalDragGestures { _, dragAmount ->
                       when {
-                          dragAmount > 50 ->  notesViewModel.tooglevisibility(true)    // Swipe right to open
-                          dragAmount < -50 ->  notesViewModel.tooglevisibility(false)    // Swipe left to close
+                          dragAmount > 50 && !popDrawerVisible && !stickyNoteVisible ->  {
+                              notesViewModel.toggleVisibility(true)
+//                              print("notes open")
+                              Log.d("Notes view","Notes open")
+                          }
+                          dragAmount < -50 && stickyNoteVisible ->  {
+                              notesViewModel.toggleVisibility(false)
+//                              print("notes close")
+                              Log.d("Notes view","Notes close")
+                          }
                       }
                   }
               }
-
       ) {
-
           AnimatedVisibility(
-              visible = !popDrawerVisible&&!showStickyNote,
+              visible = !popDrawerVisible&&!stickyNoteVisible,
               enter = fadeIn(),
               exit = fadeOut(),
               modifier = Modifier.align(Alignment.TopCenter)
@@ -68,49 +68,34 @@ fun HomeScreen(viewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel
               HomeWidgets(weatherViewModel)
           }
         AnimatedVisibility(
-            visible = !showStickyNote && !popDrawerVisible,
+            visible = !stickyNoteVisible && !popDrawerVisible,
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             OutlinedButton(
-                onClick = { viewModel.TogglePopUpDrawerVisibility(true) },
+                onClick = { popupLauncherViewModel.togglePopUpDrawerVisibility(true) },
                 modifier = Modifier
-                    // 1. Fill the available width
                     .fillMaxWidth()
                     .fillMaxSize(0.12f)
-                    // 2. Add padding on the sides and bottom to keep it off the edge
                     .padding(horizontal = 32.dp, vertical = 24.dp),
-
-                // 3. Customize the shape for rounded corners
-                shape = RoundedCornerShape(16.dp), // Adjust radius as needed
-
-                // 4. Customize the colors (optional, but good for minimal design)
-//                colors = ButtonDefaults.outlinedButtonColors(
-////                    containerColor = Color.Transparent, // Makes the background transparent
-////                    contentColor = MaterialTheme.colorScheme.onBackground // Text color (e.g., White/Black)
-//                ),
-
-                // 5. Customize the border for the outline color/thickness
+                shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground.copy())
             ) {
-                // 6. Style the text
                 Text(
-                    "ALL APPS", // Use capitalized text for emphasis
-//                    color = MaterialTheme.colorScheme.onBackground
+                    "ALL APPS",
                 )
             }
-
         }
         AnimatedVisibility(
-            visible = !popDrawerVisible && showStickyNote,
+            visible = !popDrawerVisible && stickyNoteVisible,
             enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
             exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(),
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(2f)
         ) {
-            StickyNotepadScreen(notesViewModel, onSwipeLeftToClose = {notesViewModel.tooglevisibility(false) })
+            StickyNotepadScreen(notesViewModel, onSwipeLeftToClose = {notesViewModel.toggleVisibility(false) })
         }
         AnimatedVisibility(
             visible = popDrawerVisible,
@@ -121,14 +106,10 @@ fun HomeScreen(viewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel
                 .zIndex(1f)
         ) {
             PopupAppDrawer(
-                popDrawerVisible, onDismiss = { viewModel.TogglePopUpDrawerVisibility(false)}, viewModel)
+                popDrawerVisible,
+                onDismiss = {popupLauncherViewModel.togglePopUpDrawerVisibility(false)},
+                popupLauncherViewModel
+            )
         }
-
       }
-  }
-
-
-
-
-
-
+}
