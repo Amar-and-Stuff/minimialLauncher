@@ -1,7 +1,6 @@
 package com.example.minimiallauncher.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -23,6 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,26 +39,21 @@ import com.example.minimiallauncher.viewModel.WeatherViewModel
 fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel, weatherViewModel: WeatherViewModel) {
     val popDrawerVisible by popupLauncherViewModel.popUpDrawerVisible.collectAsState()
     val stickyNoteVisible by notesViewModel.stickyNotesVisible.collectAsState()
+    var offsetX by remember { mutableStateOf(-300f) }
+    val homeScreenWidthLimit = -300f
+    val notesScreenWidthLimit = 0f
 
     Box(
           modifier = Modifier
               .fillMaxSize()
               .windowInsetsPadding(WindowInsets.statusBars)
               .pointerInput(Unit) {
-                  detectHorizontalDragGestures { _, dragAmount ->
-                      when {
-                          dragAmount > 50 && !popDrawerVisible && !stickyNoteVisible ->  {
-                              notesViewModel.toggleVisibility(true)
-//                              print("notes open")
-                              Log.d("Notes view","Notes open")
-                          }
-                          dragAmount < -50 && stickyNoteVisible ->  {
-                              notesViewModel.toggleVisibility(false)
-//                              print("notes close")
-                              Log.d("Notes view","Notes close")
-                          }
+                  detectHorizontalDragGestures(onDragStart = {offsetX=homeScreenWidthLimit}) { _, dragAmount ->
+                      offsetX = (offsetX + dragAmount).coerceIn(homeScreenWidthLimit, notesScreenWidthLimit)
+                      if(offsetX == notesScreenWidthLimit) {
+                          notesViewModel.toggleVisibility(true)
                       }
-                  }
+                     }
               }
       ) {
           AnimatedVisibility(
@@ -95,7 +92,14 @@ fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: N
                 .fillMaxSize()
                 .zIndex(2f)
         ) {
-            StickyNotepadScreen(notesViewModel, onSwipeLeftToClose = {notesViewModel.toggleVisibility(false) })
+            StickyNotepadScreen(
+                notesViewModel,
+                resetOffsetCustom= {offsetX=notesScreenWidthLimit},
+                onDrag = { dx -> offsetX = (offsetX + dx).coerceIn(homeScreenWidthLimit, notesScreenWidthLimit) }
+            )
+            if(offsetX == homeScreenWidthLimit) {
+                 notesViewModel.toggleVisibility(false);
+            }
         }
         AnimatedVisibility(
             visible = popDrawerVisible,

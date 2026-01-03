@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.minimiallauncher.viewModel.NotesViewModel
 
 @Composable
-fun StickyNotepadScreen(viewModel: NotesViewModel, onSwipeLeftToClose: () -> Unit) {
+fun StickyNotepadScreen(viewModel: NotesViewModel, resetOffsetCustom: () -> Unit, onDrag: (Float) -> Unit) {
     val text = viewModel.noteText
 
     val bgColor = MaterialTheme.colorScheme.background
@@ -47,10 +47,8 @@ fun StickyNotepadScreen(viewModel: NotesViewModel, onSwipeLeftToClose: () -> Uni
             .fillMaxSize()
             .background(bgColor)
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount ->
-                    if (dragAmount < -50) { // Swipe Left
-                        onSwipeLeftToClose()
-                    }
+                detectHorizontalDragGestures(onDragStart = {resetOffsetCustom()}) { _, dragAmount ->
+                    onDrag(dragAmount)
                 }
             }
             .padding(16.dp)
