@@ -29,13 +29,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.minimiallauncher.viewModel.AppLauncherViewModel
 import com.example.minimiallauncher.viewModel.NotesViewModel
+import com.example.minimiallauncher.viewModel.PopUpLauncherViewModel
 import com.example.minimiallauncher.viewModel.WeatherViewModel
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun HomeScreen(viewModel: AppLauncherViewModel, notesViewModel: NotesViewModel,weatherViewModel: WeatherViewModel) {
+fun HomeScreen(viewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel,weatherViewModel: WeatherViewModel) {
     val popDrawerVisible by viewModel.popUpDrawerVisible.collectAsState()
     val query by viewModel.searchQuery.collectAsState()
     val focusRequester = remember { FocusRequester() }
