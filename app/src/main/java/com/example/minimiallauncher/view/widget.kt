@@ -108,7 +108,7 @@ fun ClockWidget() {
 }
 
 fun getFormattedTime(): String {
-    val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    val formatter = SimpleDateFormat("hh:mm:ss a", Locale.getDefault())
     return formatter.format(Date())
 }
 
