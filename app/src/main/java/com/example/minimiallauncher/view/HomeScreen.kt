@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ import com.example.minimiallauncher.viewModel.WeatherViewModel
 fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel, weatherViewModel: WeatherViewModel) {
     val popDrawerVisible by popupLauncherViewModel.popUpDrawerVisible.collectAsState()
     val stickyNoteVisible by notesViewModel.stickyNotesVisible.collectAsState()
-    var offsetX by remember { mutableStateOf(-300f) }
+    var offsetX by remember { mutableFloatStateOf(-300f) }
     val homeScreenWidthLimit = -300f
     val notesScreenWidthLimit = 0f
 
@@ -49,9 +49,14 @@ fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: N
               .windowInsetsPadding(WindowInsets.statusBars)
               .pointerInput(Unit) {
                   detectHorizontalDragGestures(onDragStart = {offsetX=homeScreenWidthLimit}) { _, dragAmount ->
-                      offsetX = (offsetX + dragAmount).coerceIn(homeScreenWidthLimit, notesScreenWidthLimit)
-                      if(offsetX == notesScreenWidthLimit) {
-                          notesViewModel.toggleVisibility(true)
+                      if(!popDrawerVisible) {
+                          offsetX = (offsetX + dragAmount).coerceIn(
+                              homeScreenWidthLimit,
+                              notesScreenWidthLimit
+                          )
+                          if (offsetX == notesScreenWidthLimit) {
+                              notesViewModel.toggleVisibility(true)
+                          }
                       }
                      }
               }
@@ -98,7 +103,7 @@ fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: N
                 onDrag = { dx -> offsetX = (offsetX + dx).coerceIn(homeScreenWidthLimit, notesScreenWidthLimit) }
             )
             if(offsetX == homeScreenWidthLimit) {
-                 notesViewModel.toggleVisibility(false);
+                 notesViewModel.toggleVisibility(false)
             }
         }
         AnimatedVisibility(
