@@ -54,8 +54,8 @@ fun StickyNotepadScreen(viewModel: NotesViewModel, resetOffsetCustom: () -> Unit
             .padding(16.dp)
     ) {
         Text(
-            text = "Sticky Notepad",
-            fontSize = 20.sp,
+            text = "Note",
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = textColor
         )
@@ -78,8 +78,8 @@ fun StickyNotepadScreen(viewModel: NotesViewModel, resetOffsetCustom: () -> Unit
                 unfocusedTextColor = textColor
             ),
             textStyle = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 22.sp
+                fontSize = 22.sp,
+                lineHeight = 30.sp
             ),
             placeholder = {
                 Text(
