@@ -1,4 +1,4 @@
-package com.example.minimiallauncher.Data.NotesData
+package com.example.minimiallauncher.data.notesdata
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

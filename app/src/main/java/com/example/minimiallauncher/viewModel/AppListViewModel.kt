@@ -1,38 +1,28 @@
 package com.example.minimiallauncher.viewModel
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.minimiallauncher.service.fuzzySearchPriority
 import com.example.minimiallauncher.model.SystemAppModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class PopUpLauncherViewModel(application: Application) : AndroidViewModel(application) {
+class AppListViewModel(application: Application) : AndroidViewModel(application) {
     private val _appList = MutableStateFlow<List<SystemAppModel>>(emptyList())
     val appList = _appList.asStateFlow()
-
-    private val _drawerVisible = MutableStateFlow(false)
-    val drawerVisible = _drawerVisible.asStateFlow()
-
-    private val _popUpDrawerVisible = MutableStateFlow(false)
-    val popUpDrawerVisible = _popUpDrawerVisible.asStateFlow()
-
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
-    private val _showSystemUI = MutableSharedFlow<Unit>()
-    val showSystemUI = _showSystemUI.asSharedFlow()
-
+    init {
+        fetchInstalledApps()
+    }
 
 
     val filteredApps = combine(_appList, _searchQuery) { apps, query ->
@@ -58,14 +48,11 @@ class PopUpLauncherViewModel(application: Application) : AndroidViewModel(applic
         initialValue = emptyList()
     )
 
-
-
-    init {
-        loadInstalledApps()
+    fun updatedSearchQuery(query: String){
+        _searchQuery.value =query
     }
 
-    @SuppressLint("QueryPermissionsNeeded")
-    private fun loadInstalledApps() {
+    fun fetchInstalledApps() {
         viewModelScope.launch {
             val pm = getApplication<Application>().packageManager
             val intent = Intent(Intent.ACTION_MAIN, null).apply {
@@ -86,27 +73,4 @@ class PopUpLauncherViewModel(application: Application) : AndroidViewModel(applic
             _appList.value = apps
         }
     }
-
-    fun updatedSearchQuery(query: String){
-        _searchQuery.value =query
-    }
-    fun requestShowSystemUI(){
-        viewModelScope.launch {
-            _showSystemUI.emit(Unit)
-        }
-
-    }
-
-    fun togglePopUpDrawerVisibility(show: Boolean) {
-        _popUpDrawerVisible.value = show
-    }
 }
-
-
-
-
-
-
-
-
-

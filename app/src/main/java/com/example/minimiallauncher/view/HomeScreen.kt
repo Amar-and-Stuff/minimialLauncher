@@ -30,13 +30,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.example.minimiallauncher.viewModel.AppListViewModel
 import com.example.minimiallauncher.viewModel.NotesViewModel
 import com.example.minimiallauncher.viewModel.PopUpLauncherViewModel
 import com.example.minimiallauncher.viewModel.WeatherViewModel
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: NotesViewModel, weatherViewModel: WeatherViewModel) {
+fun HomeScreen(
+    popupLauncherViewModel: PopUpLauncherViewModel,
+    notesViewModel: NotesViewModel,
+    weatherViewModel: WeatherViewModel,
+    appListViewModel: AppListViewModel
+) {
     val popDrawerVisible by popupLauncherViewModel.popUpDrawerVisible.collectAsState()
     val stickyNoteVisible by notesViewModel.stickyNotesVisible.collectAsState()
     var offsetX by remember { mutableFloatStateOf(-300f) }
@@ -117,7 +123,8 @@ fun HomeScreen(popupLauncherViewModel: PopUpLauncherViewModel, notesViewModel: N
             PopupAppDrawer(
                 popDrawerVisible,
                 onDismiss = {popupLauncherViewModel.togglePopUpDrawerVisibility(false)},
-                popupLauncherViewModel
+                popupLauncherViewModel,
+                appListViewModel
             )
         }
       }

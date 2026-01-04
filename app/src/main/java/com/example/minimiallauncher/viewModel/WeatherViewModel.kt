@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.minimiallauncher.Data.WeatherData.RetrofitInstance
+import com.example.minimiallauncher.data.weatherdata.RetrofitInstance
 import com.example.minimiallauncher.model.WeatherResponse
 import kotlinx.coroutines.launch
 

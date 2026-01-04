@@ -1,4 +1,4 @@
-package com.example.minimiallauncher.Service
+package com.example.minimiallauncher.service
 
 import kotlin.text.iterator
 

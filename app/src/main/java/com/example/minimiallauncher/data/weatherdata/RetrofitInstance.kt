@@ -1,6 +1,5 @@
-package com.example.minimiallauncher.Data.WeatherData
+package com.example.minimiallauncher.data.weatherdata
 
-import com.example.minimiallauncher.Data.WeatherData.WeatherApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
