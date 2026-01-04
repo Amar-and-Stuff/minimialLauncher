@@ -26,7 +26,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
-import androidx.compose.ui.tooling.preview.Preview
+import android.content.Intent
+import android.provider.AlarmClock
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -34,7 +41,6 @@ fun HomeWidgets(
     weatherViewModel: WeatherViewModel
 ) {
     val context = LocalContext.current
-
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -61,22 +67,21 @@ fun HomeWidgets(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(26.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(25.dp))
         ClockWidget()
-        WeatherWidget(weatherViewModel)
-        CalendarWidget()
- //      DigitalWidget(screenTime)
+        // Calender widget
+        GeneralWidget("Today: " + SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()).format(Date()), 18,
+            Intent(AlarmClock.ACTION_SHOW_ALARMS))
+        // weather widget
+        GeneralWidget(weatherViewModel.getWeatherString(), 18)
+        // add more widgets like this
+        // GeneralWidget("Nothing but a general widget", 18)
     }
 }
-@Composable
-fun DigitalWidget(screenTime: String) {
-    Text(
-        text = "Screen Time: $screenTime",
-        style = MaterialTheme.typography.bodyLarge
-    )
-}
+
 @Composable
 fun WeatherWidget(viewModel: WeatherViewModel) {
     val data by viewModel.weatherData
@@ -90,7 +95,6 @@ fun WeatherWidget(viewModel: WeatherViewModel) {
 
 
 @Composable
-@Preview
 fun ClockWidget() {
     var currentTime by remember { mutableStateOf(getFormattedTime()) }
 
@@ -100,11 +104,7 @@ fun ClockWidget() {
             delay(1000L)
         }
     }
-
-    Text(
-        text = currentTime,
-        style = MaterialTheme.typography.headlineLarge
-    )
+    GeneralWidget(currentTime, 48, Intent(AlarmClock.ACTION_SHOW_ALARMS))
 }
 
 fun getFormattedTime(): String {
@@ -113,7 +113,6 @@ fun getFormattedTime(): String {
 }
 
 @Composable
-@Preview
 fun CalendarWidget() {
     val today = SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault()).format(Date())
     Text(
@@ -122,4 +121,25 @@ fun CalendarWidget() {
     )
 }
 
+@Composable
+fun GeneralWidget(text: String, textSize: Int, appToOpen: Intent) {
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .clickable(
+            onClick ={
+                context.startActivity(appToOpen)
+                Log.d("Clock widget","clock widget clicked")
+            }
+        )) {
+        GeneralWidget(text, textSize)
+    }
+}
 
+@Composable
+fun GeneralWidget(text: String, textSize: Int) {
+        Text(
+            text = text,
+            fontSize = textSize.sp,
+        )
+}

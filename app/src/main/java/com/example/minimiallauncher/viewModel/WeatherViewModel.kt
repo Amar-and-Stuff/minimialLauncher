@@ -1,5 +1,6 @@
 package com.example.minimiallauncher.viewModel
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,6 +22,16 @@ class WeatherViewModel : ViewModel() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    fun getWeatherString() : String {
+        val data by weatherData
+
+        return if (data != null) {
+            "Temp: ${data!!.main.temp}°C, ${data!!.weather[0].description}"
+        } else {
+            "Fetching weather..."
         }
     }
 }
