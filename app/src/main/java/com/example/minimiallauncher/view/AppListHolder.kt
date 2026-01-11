@@ -1,6 +1,5 @@
 package com.example.minimiallauncher.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,32 +23,40 @@ import com.example.minimiallauncher.viewModel.AppListViewModel
 
 
 @Composable
-fun AppListHolder(
+fun FavoriteAppsList(
     appListViewModel: AppListViewModel,
     onAppLaunched: () -> Unit,
-    modifier: Modifier
 ) {
 
-    val apps by appListViewModel.filteredApps.collectAsState()
+    val apps by appListViewModel.favApps.collectAsState()
     val listState = rememberLazyListState()
 
     Card(
         modifier = Modifier
-            .background(Color.Green)
-            .fillMaxWidth()
-            .fillMaxSize(),
+            .fillMaxWidth(0.8f)
+            .fillMaxSize(0.4f),
     ) {
         LazyColumn(
             state = listState,
             reverseLayout = true,
-            verticalArrangement = Arrangement.Bottom,
-            modifier = modifier
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(0.dp, 20.dp)
         ) {
             items(apps) { app ->
                 AppItem(app, onAppLaunched)
             }
         }
     }
+}
+
+@Composable
+fun FavoriteAppsList(
+    appListViewModel: AppListViewModel,
+    // appList: List<SystemAppModel>,
+) {
+    FavoriteAppsList(appListViewModel, {})
 }
 
 @Composable

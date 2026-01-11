@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -75,6 +76,16 @@ fun HomeScreen(
           ) {
               HomeWidgets(weatherViewModel)
           }
+        AnimatedVisibility(
+            visible = !popDrawerVisible&&!stickyNoteVisible,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y= (-100).dp)
+        ) {
+            FavoriteAppsList(appListViewModel)
+        }
         AnimatedVisibility(
             visible = !stickyNoteVisible && !popDrawerVisible,
             enter = fadeIn(),

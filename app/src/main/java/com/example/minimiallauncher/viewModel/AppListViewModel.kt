@@ -20,8 +20,52 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    private val _favAppData = arrayListOf(
+        arrayListOf("Phone", "com.google.android.dialer"),
+        arrayListOf("VLC", "org.videolan.vlc"),
+        arrayListOf("Firefox", "org.mozilla.firefox"),
+        arrayListOf("ChatGPT", "com.openai.chatgpt"),
+        arrayListOf("WhatsApp", "com.whatsapp"),
+    )
+    private val _favApps = MutableStateFlow<List<SystemAppModel>>(emptyList())
+    val favApps = _favApps.asStateFlow()
+
     init {
         fetchInstalledApps()
+        fetchFavApps()
+    }
+
+    private fun fetchFavApps() {
+
+        viewModelScope.launch {
+            val pm = getApplication<Application>().packageManager
+            val intent = Intent(Intent.ACTION_MAIN, null).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+            }
+
+            val resolvedApps = pm.queryIntentActivities(intent, 0)
+
+            val apps = resolvedApps.map {
+                val appInfo = it.activityInfo.applicationInfo
+                SystemAppModel(
+                    appName = it.loadLabel(pm).toString(),
+                    packageName = appInfo.packageName,
+                    icon = appInfo.loadIcon(pm)
+                )
+            }.sortedBy { it.appName.lowercase() }
+
+
+            val temp = ArrayList<SystemAppModel>()
+            for(app in apps) {
+                for(appData in _favAppData) {
+                    if(appData.contains(app.appName) && appData.contains(app.packageName)) {
+                        temp.add(app)
+                    }
+                }
+            }
+            _favApps.value = temp
+
+        }
     }
 
 
