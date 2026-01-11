@@ -48,21 +48,8 @@ fun PopupAppDrawer(
     popUpLauncherViewModel: PopUpLauncherViewModel,
     appListViewModel: AppListViewModel
 ) {
-    val context = LocalContext.current
-    // val query by popUpLauncherViewModel.searchQuery.collectAsState()
-    val query by appListViewModel.searchQuery.collectAsState()
-    // val apps by popUpLauncherViewModel.filteredApps.collectAsState()
-    val apps by appListViewModel.filteredApps.collectAsState()
-    val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    val cleanupAndDismiss: () -> Unit = {
-        keyboardController?.hide()
-        // popUpLauncherViewModel.updatedSearchQuery("")
-        appListViewModel.updatedSearchQuery("")
-        popUpLauncherViewModel.togglePopUpDrawerVisibility(false)
-    }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -79,7 +66,6 @@ fun PopupAppDrawer(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                //.background(Color(255, 0,0))
         ) {
             Box(
                 modifier = Modifier
@@ -88,10 +74,9 @@ fun PopupAppDrawer(
                         detectTapGestures(
                             onTap = {
                                 onDismiss()
-                                // popUpLauncherViewModel.updatedSearchQuery("")
                                 appListViewModel.updatedSearchQuery("")
                                 Log.d("Popup view", "Tap")
-                                },
+                            },
                         )
                     }
             )
@@ -100,57 +85,75 @@ fun PopupAppDrawer(
                 enter = slideInVertically { it / 2 } + fadeIn(),
                 exit = slideOutVertically { it / 2 } + fadeOut(),
                 modifier = Modifier.align(Alignment.Center)
+                    .fillMaxWidth(0.8f)
+                    .fillMaxSize(0.4f),
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .fillMaxSize(0.4f),
-                ) {
-                    LazyColumn(
-                        state = listState,
-                        reverseLayout = true,
-                        verticalArrangement = Arrangement.Bottom,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(apps) { app ->
-                            AppItem(app, onAppLaunched = cleanupAndDismiss)
-                        }
-                    }
-//                    AppListHolder(appListViewModel, cleanupAndDismiss, modifier = Modifier.fillMaxWidth().weight(1f))
-                    OutlinedTextField(
-                        value = query,
-                        // onValueChange = popUpLauncherViewModel::updatedSearchQuery,
-                        onValueChange = appListViewModel::updatedSearchQuery,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        keyboardActions = KeyboardActions(
-                            onSearch = {
-                                val firstApp = apps.firstOrNull()
-                                if (firstApp != null) {
-                                    val intent = context.packageManager.getLaunchIntentForPackage(firstApp.packageName)
-                                    if (intent != null) context.startActivity(intent)
-                                    cleanupAndDismiss()
-                                }
-                            }
-                        ),
-                        placeholder = { Text("Search apps") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(focusRequester),
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(Icons.Default.Search, contentDescription = null)
-                        }
-                    )
-                }
+                FullAppsList(popUpLauncherViewModel, appListViewModel, focusRequester)
             }
         }
     }
 }
 
 
+@Composable
+fun FullAppsList(
+    popUpLauncherViewModel: PopUpLauncherViewModel,
+    appListViewModel: AppListViewModel,
+    focusRequester: FocusRequester
+) {
+    val context = LocalContext.current
+    val query by appListViewModel.searchQuery.collectAsState()
+    val apps by appListViewModel.filteredApps.collectAsState()
+    val listState = rememberLazyListState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
+    val cleanupAndDismiss: () -> Unit = {
+        keyboardController?.hide()
+        appListViewModel.updatedSearchQuery("")
+        popUpLauncherViewModel.togglePopUpDrawerVisibility(false)
+    }
+
+    Card() {
+        LazyColumn(
+            state = listState,
+            reverseLayout = true,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            items(apps) { app ->
+                AppItem(app, onAppLaunched = cleanupAndDismiss)
+            }
+        }
+        OutlinedTextField(
+            value = query,
+            onValueChange = appListViewModel::updatedSearchQuery,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            shape = RoundedCornerShape(16.dp),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    val firstApp = apps.firstOrNull()
+                    if (firstApp != null) {
+                        val intent =
+                            context.packageManager.getLaunchIntentForPackage(
+                                firstApp.packageName
+                            )
+                        if (intent != null) context.startActivity(intent)
+                        cleanupAndDismiss()
+                    }
+                }
+            ),
+            placeholder = { Text("Search apps") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            singleLine = true,
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null)
+            }
+        )
+    }
+}
